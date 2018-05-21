@@ -1,0 +1,10 @@
+{
+    "dotnet-test-explorer.testProjectPath": "./test/unittests/",
+    "files.associations": {
+        "*.ruleset": "xml",
+    },
+    "editor.rulers": [
+        80,
+        120
+    ],
+}
