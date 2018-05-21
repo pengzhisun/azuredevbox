@@ -21,7 +21,7 @@ namespace Winl.AzureDevBox.ConsoleDemo.Demos
         #region Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SimpleDemo"/> class.
+        /// Initializes a new instance of the <see cref="ChecksDemo"/> class.
         /// </summary>
         public ChecksDemo()
             : base(enableSyncDemo: true, enableAsyncDemo: false)

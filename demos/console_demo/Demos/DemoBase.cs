@@ -11,6 +11,8 @@ namespace Winl.AzureDevBox.ConsoleDemo.Demos
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
+
+    using Newtonsoft.Json;
     using Winl.AzureDevBox.Extensions;
 
     /// <summary>
@@ -106,6 +108,11 @@ namespace Winl.AzureDevBox.ConsoleDemo.Demos
         {
             return Task.CompletedTask;
         }
+
+        protected void PrintObjectInfo(object obj)
+            => Console.WriteLine(
+                $"{obj.GetType().Name}\r\n{JsonConvert.SerializeObject(obj, Formatting.Indented)}");
+
 
         #endregion
 

@@ -1,10 +1,22 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <ItemGroup>
-    <ProjectReference Include="..\..\src\shared\common\common.csproj" />
-  </ItemGroup>
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.0</TargetFramework>
     <RootNamespace>Winl.AzureDevBox.ConsoleDemo</RootNamespace>
   </PropertyGroup>
+  <PropertyGroup>
+    <UserSecretsId>3ABF019D-847E-49BF-9D32-7E52B46707B2</UserSecretsId>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\shared\common\common.csproj" />
+    <ProjectReference Include="..\..\src\shared\azure_platform_contract\azure_platform_contract.csproj" />
+    <ProjectReference Include="..\..\src\shared\azure_platform\azure_platform.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="2.0.2" />
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+  </ItemGroup>
+  <ItemGroup>
+    <DotNetCliToolReference Include="Microsoft.Extensions.SecretManager.Tools" Version="2.0.0" PrivateAssets="All" />
+  </ItemGroup>
 </Project>

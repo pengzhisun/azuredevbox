@@ -22,7 +22,8 @@ namespace Winl.AzureDevBox.ConsoleDemo
         /// <param name="args">The command line arguments.</param>
         public static void Main(string[] args)
         {
-            RunDemo<ChecksDemo>();
+            // RunDemo<ChecksDemo>();
+            RunDemo<EventHubDemo>();
         }
 
         /// <summary>
