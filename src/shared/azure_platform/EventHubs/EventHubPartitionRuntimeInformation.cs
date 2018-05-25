@@ -1,3 +1,10 @@
+//------------------------------------------------------------------------------
+// <copyright file="EventHubPartitionRuntimeInformation.cs" company="Pengzhi Sun">
+// Copyright (c) Pengzhi Sun. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+// </copyright>
+// -----------------------------------------------------------------------
+
 namespace Winl.AzureDevBox.AzurePlatform.EventHubs
 {
     using System;
@@ -5,7 +12,7 @@ namespace Winl.AzureDevBox.AzurePlatform.EventHubs
     using AzureEventHubPartitionRuntimeInformation = Microsoft.Azure.EventHubs.EventHubPartitionRuntimeInformation;
 
     /// <summary>
-    /// Defines the event hub partition runtime information class.
+    /// Defines the Event Hub partition runtime information class.
     /// </summary>
     /// <seealso cref="IEventHubPartitionRuntimeInformation" />
     public sealed class EventHubPartitionRuntimeInformation
@@ -14,9 +21,9 @@ namespace Winl.AzureDevBox.AzurePlatform.EventHubs
         #region Fields
 
         /// <summary>
-        /// The internal Azure event hub partition information.
+        /// The internal Azure Event Hub partition information.
         /// </summary>
-        private readonly AzureEventHubPartitionRuntimeInformation internalPartitionInfo;
+        private readonly AzureEventHubPartitionRuntimeInformation azurePartitionInfo;
 
         #endregion
 
@@ -25,11 +32,17 @@ namespace Winl.AzureDevBox.AzurePlatform.EventHubs
         /// <summary>
         /// Initializes a new instance of the <see cref="EventHubPartitionRuntimeInformation"/> class.
         /// </summary>
-        /// <param name="partitionInformation">The Azure event hub partition information.</param>
+        /// <param name="partitionInformation">The <see cref="AzureEventHubPartitionRuntimeInformation" /> instance.</param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if the given <see cref="AzureEventHubPartitionRuntimeInformation"/> instance is null.
+        /// </exception>
         public EventHubPartitionRuntimeInformation(
             AzureEventHubPartitionRuntimeInformation partitionInformation)
         {
-            this.internalPartitionInfo = partitionInformation;
+            Checks.Parameter(nameof(partitionInformation), partitionInformation)
+                .NotNull();
+
+            this.azurePartitionInfo = partitionInformation;
         }
 
         #endregion
@@ -37,56 +50,39 @@ namespace Winl.AzureDevBox.AzurePlatform.EventHubs
         #region Properties
 
         /// <summary>
-        /// Gets the path.
+        /// Gets the path of the Event Hub.
         /// </summary>
-        /// <value>
-        /// The path.
-        /// </value>
-        public string Path => this.internalPartitionInfo.Path;
+        public string Path => this.azurePartitionInfo.Path;
 
         /// <summary>
-        /// Gets the partition identifier.
+        /// Gets the partition identifier for a logical partition of the Event
+        /// Hub.
         /// </summary>
-        /// <value>
-        /// The partition identifier.
-        /// </value>
-        public string PartitionId => this.internalPartitionInfo.PartitionId;
+        public string PartitionId => this.azurePartitionInfo.PartitionId;
 
         /// <summary>
-        /// Gets the begin sequence number.
+        /// Gets the begin sequence number within the Event Hub partition stream.
         /// </summary>
-        /// <value>
-        /// The begin sequence number.
-        /// </value>
         public long BeginSequenceNumber
-            => this.internalPartitionInfo.BeginSequenceNumber;
+            => this.azurePartitionInfo.BeginSequenceNumber;
 
         /// <summary>
-        /// Gets the last enqueued sequence number.
+        /// Gets the end sequence number within the Event Hub partition stream.
         /// </summary>
-        /// <value>
-        /// The last enqueued sequence number.
-        /// </value>
         public long LastEnqueuedSequenceNumber
-            => this.internalPartitionInfo.LastEnqueuedSequenceNumber;
+            => this.azurePartitionInfo.LastEnqueuedSequenceNumber;
 
         /// <summary>
-        /// Gets the last enqueued offset.
+        /// Gets the offset of the last enqueued event.
         /// </summary>
-        /// <value>
-        /// The last enqueued offset.
-        /// </value>
         public string LastEnqueuedOffset
-            => this.internalPartitionInfo.LastEnqueuedOffset;
+            => this.azurePartitionInfo.LastEnqueuedOffset;
 
         /// <summary>
-        /// Gets the last enqueued time UTC.
+        /// Gets the enqueued UTC time of the last event.
         /// </summary>
-        /// <value>
-        /// The last enqueued time UTC.
-        /// </value>
         public DateTime LastEnqueuedTimeUtc
-            => this.internalPartitionInfo.LastEnqueuedTimeUtc;
+            => this.azurePartitionInfo.LastEnqueuedTimeUtc;
 
         #endregion
     }

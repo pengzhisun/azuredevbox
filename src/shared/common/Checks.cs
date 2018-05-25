@@ -17,7 +17,7 @@ namespace Winl.AzureDevBox
 
         public static IParameterCheck Parameter<TValue>(
             string name,
-            TValue value)
+            [ValidatedNotNull] TValue value)
         {
             Debug.Assert(
                 !string.IsNullOrWhiteSpace(name),

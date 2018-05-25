@@ -9,7 +9,7 @@ namespace Winl.AzureDevBox.AzurePlatform.EventHubs
 
         string BodyString { get; }
 
-        IDictionary<string, object> Properties { get; }
+        IReadOnlyDictionary<string, object> Properties { get; }
 
         long SequenceNumber { get; }
 
