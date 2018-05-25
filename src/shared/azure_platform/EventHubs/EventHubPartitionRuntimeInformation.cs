@@ -15,7 +15,7 @@ namespace Winl.AzureDevBox.AzurePlatform.EventHubs
     /// Defines the Event Hub partition runtime information class.
     /// </summary>
     /// <seealso cref="IEventHubPartitionRuntimeInformation" />
-    public sealed class EventHubPartitionRuntimeInformation
+    internal sealed class EventHubPartitionRuntimeInformation
         : IEventHubPartitionRuntimeInformation
     {
         #region Fields
@@ -32,17 +32,19 @@ namespace Winl.AzureDevBox.AzurePlatform.EventHubs
         /// <summary>
         /// Initializes a new instance of the <see cref="EventHubPartitionRuntimeInformation"/> class.
         /// </summary>
-        /// <param name="partitionInformation">The <see cref="AzureEventHubPartitionRuntimeInformation" /> instance.</param>
+        /// <param name="azurePartitionInformation">The <see cref="AzureEventHubPartitionRuntimeInformation" /> instance.</param>
         /// <exception cref="ArgumentNullException">
         /// Thrown if the given <see cref="AzureEventHubPartitionRuntimeInformation"/> instance is null.
         /// </exception>
         public EventHubPartitionRuntimeInformation(
-            AzureEventHubPartitionRuntimeInformation partitionInformation)
+            AzureEventHubPartitionRuntimeInformation azurePartitionInformation)
         {
-            Checks.Parameter(nameof(partitionInformation), partitionInformation)
+            Checks.Parameter(
+                nameof(azurePartitionInformation),
+                azurePartitionInformation)
                 .NotNull();
 
-            this.azurePartitionInfo = partitionInformation;
+            this.azurePartitionInfo = azurePartitionInformation;
         }
 
         #endregion

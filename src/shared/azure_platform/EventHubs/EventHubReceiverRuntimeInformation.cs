@@ -14,7 +14,7 @@ namespace Winl.AzureDevBox.AzurePlatform.EventHubs
     /// <summary>
     /// Defines the Event Hub receiver runtime information class.
     /// </summary>
-    public sealed class EventHubReceiverRuntimeInformation
+    internal sealed class EventHubReceiverRuntimeInformation
         : IEventHubReceiverRuntimeInformation
     {
         #region Fields
@@ -22,7 +22,7 @@ namespace Winl.AzureDevBox.AzurePlatform.EventHubs
         /// <summary>
         /// The internal Azure Event Hub receiver runtime information instance.
         /// </summary>
-        private readonly AzureReceiverRuntimeInformation azureRuntimeInfo;
+        private readonly AzureReceiverRuntimeInformation azureReceiverInfo;
 
         #endregion
 
@@ -31,19 +31,19 @@ namespace Winl.AzureDevBox.AzurePlatform.EventHubs
         /// <summary>
         /// Initializes a new instance of the <see cref="EventHubReceiverRuntimeInformation"/> class.
         /// </summary>
-        /// <param name="azureReceiverRuntimeInformation">The <see cref="AzureReceiverRuntimeInformation"/> instance.</param>
+        /// <param name="azureReceiverInformation">The <see cref="AzureReceiverRuntimeInformation"/> instance.</param>
         /// <exception cref="ArgumentNullException">
         /// Thrown if the given <see cref="AzureReceiverRuntimeInformation"/> instance is null.
         /// </exception>
         public EventHubReceiverRuntimeInformation(
-            AzureReceiverRuntimeInformation azureReceiverRuntimeInformation)
+            AzureReceiverRuntimeInformation azureReceiverInformation)
         {
             Checks.Parameter(
-                nameof(azureReceiverRuntimeInformation),
-                azureReceiverRuntimeInformation)
+                nameof(azureReceiverInformation),
+                azureReceiverInformation)
                 .NotNull();
 
-            this.azureRuntimeInfo = azureReceiverRuntimeInformation;
+            this.azureReceiverInfo = azureReceiverInformation;
         }
 
         #endregion
@@ -54,33 +54,33 @@ namespace Winl.AzureDevBox.AzurePlatform.EventHubs
         /// Gets the partition identifier for a logical partition of the Event
         /// Hub.
         /// </summary>
-        public string PartitionId => this.azureRuntimeInfo.PartitionId;
+        public string PartitionId => this.azureReceiverInfo.PartitionId;
 
         /// <summary>
         /// Gets the sequence number of the last event within the Event Hub
         /// partition stream.
         /// </summary>
         public long LastSequenceNumber
-            => this.azureRuntimeInfo.LastSequenceNumber;
+            => this.azureReceiverInfo.LastSequenceNumber;
 
         /// <summary>
         /// Gets the enqueued UTC time of the last event within the Event Hub
         /// partition stream.
         /// </summary>
         public DateTime LastEnqueuedTimeUtc
-            => this.azureRuntimeInfo.LastEnqueuedTimeUtc;
+            => this.azureReceiverInfo.LastEnqueuedTimeUtc;
 
         /// <summary>
         /// Gets the offset of the last event within the Event Hub partition
         /// stream.
         /// </summary>
         public string LastEnqueuedOffset
-            => this.azureRuntimeInfo.LastEnqueuedOffset;
+            => this.azureReceiverInfo.LastEnqueuedOffset;
 
         /// <summary>
         /// Gets the time of when the runtime infomation was retrieved.
         /// </summary>
-        public DateTime RetrievalTime => this.azureRuntimeInfo.RetrievalTime;
+        public DateTime RetrievalTime => this.azureReceiverInfo.RetrievalTime;
 
         #endregion
     }

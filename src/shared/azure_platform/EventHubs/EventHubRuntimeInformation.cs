@@ -1,3 +1,10 @@
+//------------------------------------------------------------------------------
+// <copyright file="EventHubRuntimeInformation.cs" company="Pengzhi Sun">
+// Copyright (c) Pengzhi Sun. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+// </copyright>
+// -----------------------------------------------------------------------
+
 namespace Winl.AzureDevBox.AzurePlatform.EventHubs
 {
     using System;
@@ -10,14 +17,14 @@ namespace Winl.AzureDevBox.AzurePlatform.EventHubs
     /// Defines the event hub runtime information class.
     /// </summary>
     /// <seealso cref="IEventHubRuntimeInformation" />
-    public sealed class EventHubRuntimeInformation : IEventHubRuntimeInformation
+    internal sealed class EventHubRuntimeInformation : IEventHubRuntimeInformation
     {
         #region Fields
 
         /// <summary>
-        /// The internal Azure event hub runtime information
+        /// The internal Azure Event Hub runtime information.
         /// </summary>
-        private readonly AzureEventHubRuntimeInformation internalRuntimeInfo;
+        private readonly AzureEventHubRuntimeInformation azureRuntimeInfo;
 
         #endregion
 
@@ -26,11 +33,19 @@ namespace Winl.AzureDevBox.AzurePlatform.EventHubs
         /// <summary>
         /// Initializes a new instance of the <see cref="EventHubRuntimeInformation"/> class.
         /// </summary>
-        /// <param name="runtimeInformation">The Azure event hub runtime information.</param>
+        /// <param name="azureRuntimeInformation">The <see cref="AzureEventHubRuntimeInformation" /> instance.</param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if the given <see cref="AzureEventHubRuntimeInformation"/> instance is null.
+        /// </exception>
         public EventHubRuntimeInformation(
-            AzureEventHubRuntimeInformation runtimeInformation)
+            AzureEventHubRuntimeInformation azureRuntimeInformation)
         {
-            this.internalRuntimeInfo = runtimeInformation;
+            Checks.Parameter(
+                nameof(azureRuntimeInformation),
+                azureRuntimeInformation)
+                .NotNull();
+
+            this.azureRuntimeInfo = azureRuntimeInformation;
         }
 
         #endregion
@@ -38,37 +53,25 @@ namespace Winl.AzureDevBox.AzurePlatform.EventHubs
         #region Properties
 
         /// <summary>
-        /// Gets the path.
+        /// Gets the path to the Event Hub.
         /// </summary>
-        /// <value>
-        /// The path.
-        /// </value>
-        public string Path => this.internalRuntimeInfo.Path;
+        public string Path => this.azureRuntimeInfo.Path;
 
         /// <summary>
-        /// Gets the created at.
+        /// Gets the time at which the Event Hub was created.
         /// </summary>
-        /// <value>
-        /// The created at.
-        /// </value>
-        public DateTime CreatedAt => this.internalRuntimeInfo.CreatedAt;
+        public DateTime CreatedAt => this.azureRuntimeInfo.CreatedAt;
 
         /// <summary>
-        /// Gets the partition count.
+        /// Gets the number of partitions in an Event Hub.
         /// </summary>
-        /// <value>
-        /// The partition count.
-        /// </value>
-        public int PartitionCount => this.internalRuntimeInfo.PartitionCount;
+        public int PartitionCount => this.azureRuntimeInfo.PartitionCount;
 
         /// <summary>
-        /// Gets the partition ids.
+        /// Gets the partition IDs for an Event Hub.
         /// </summary>
-        /// <value>
-        /// The partition ids.
-        /// </value>
         public IEnumerable<string> PartitionIds
-            => this.internalRuntimeInfo.PartitionIds.Skip(0);
+            => this.azureRuntimeInfo.PartitionIds.Skip(0);
 
         #endregion
     }
