@@ -83,10 +83,16 @@ namespace Winl.AzureDevBox.ConsoleDemo.Demos
             Console.WriteLine($"Total sent: {batchCount * batchSize}");
 
             IEventProcessor eventProcessor =
-                 new EventProcessor(
+                new EventProcessor(
                    this.EventHubConsumerGroup,
                    this.StorageAccountConnectionString,
-                   this.StorageAccountContainer);
+                   this.StorageAccountContainer)
+                {
+                    Options = new EventProcessorOptions
+                    {
+                        MaxBatchSize = 50
+                    }
+                };
 
             int totalReceived = 0;
 

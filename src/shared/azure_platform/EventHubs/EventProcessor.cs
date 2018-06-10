@@ -23,6 +23,8 @@ namespace Winl.AzureDevBox.AzurePlatform.EventHubs
 
         public string ContainerName { get; private set; }
 
+        public IEventProcessorOptions Options { get; set; }
+
         public event EventProcessorAsyncEventHandler OnClosed;
 
         public event EventProcessorAsyncEventHandler OnOpened;

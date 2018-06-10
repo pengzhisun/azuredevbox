@@ -51,7 +51,8 @@ namespace Winl.AzureDevBox.AzurePlatform.EventHubs
                 new AzureEventProcessorFactory(this.EventProcessor);
 
             await processorHost.RegisterEventProcessorFactoryAsync(
-                azureEventProcessorFactory);
+                azureEventProcessorFactory,
+                this.EventProcessor.Options.ToAzureOptions());
 
             this.azureEventProcessorHost = processorHost;
         }
