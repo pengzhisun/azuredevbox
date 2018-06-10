@@ -1,4 +1,4 @@
-namespace Winl.AzureDevBox.Validations
+namespace Winl.AzureDevBox.Validation
 {
     public interface IParameterCheck
     {

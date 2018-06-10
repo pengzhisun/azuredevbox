@@ -9,7 +9,7 @@ namespace Winl.AzureDevBox
 {
     using System.Diagnostics;
     using System.Threading;
-    using Winl.AzureDevBox.Validations;
+    using Winl.AzureDevBox.Validation;
 
     public static class Checks
     {

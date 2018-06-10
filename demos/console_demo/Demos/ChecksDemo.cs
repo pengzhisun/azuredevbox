@@ -10,7 +10,7 @@ namespace Winl.AzureDevBox.ConsoleDemo.Demos
     using System;
     using System.Collections.Generic;
     using System.Threading.Tasks;
-    using Winl.AzureDevBox.Validations;
+    using Winl.AzureDevBox.Validation;
 
     /// <summary>
     /// Defines the Checks demo;
@@ -71,18 +71,27 @@ namespace Winl.AzureDevBox.ConsoleDemo.Demos
             IEnumerable<TValue> paramValues,
             Action<IParameterCheck> checkAction)
         {
+            ConsoleColor originalColor = Console.ForegroundColor;
+
             foreach (TValue paramValue in paramValues)
             {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine($"> Checking parameter '{paramName}' with value: '{paramValue}'");
+
                 try
                 {
                     IParameterCheck checkInstance =
                         Checks.Parameter(paramName, paramValue);
                     checkAction.Invoke(checkInstance);
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine($"{ex.GetType().Name}: {ex.Message}");
                 }
             }
+
+            Console.ForegroundColor = originalColor;
         }
 
         #endregion
