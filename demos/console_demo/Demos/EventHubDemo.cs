@@ -70,14 +70,14 @@ namespace Winl.AzureDevBox.ConsoleDemo.Demos
 
             this.PrintObjectInfo(partionInfos);
 
-            int batchCount = 5;
-            int batchSize = 10;
+            int batchCount = 500;
+            int batchSize = 100;
             for (int batchIdx = 0; batchIdx < batchCount; ++batchIdx)
             {
                 await eventHubClient
                     .BatchSendAsync(
                         new int[batchSize].Select(
-                            (v, i) => $"Data {batchIdx}-{i} at {DateTime.UtcNow:o}"))
+                            (v, i) => $"Data {batchIdx}-{i} at {DateTime.UtcNow:o} dummy: {new string('$', 256)}"))
                     .ConfigureAwait(false);
             }
             Console.WriteLine($"Total sent: {batchCount * batchSize}");
@@ -87,34 +87,133 @@ namespace Winl.AzureDevBox.ConsoleDemo.Demos
                    this.EventHubConsumerGroup,
                    this.StorageAccountConnectionString,
                    this.StorageAccountContainer)
-                {
-                    Options = new EventProcessorOptions
-                    {
-                        MaxBatchSize = 50
-                    }
-                };
+                   {
+                       Options = new EventProcessorOptions
+                       {
+                           MaxBatchSize = 50,
+                           PrefetchCount = 500
+                       }
+                   };
 
             int totalReceived = 0;
 
-            async Task eventProcessorHandler(object obj, EventProcessorEventArgs args)
+            Dictionary<string, List<IEventData>> bufferDic =
+                new Dictionary<string, List<IEventData>>();
+
+            Dictionary<string, DateTimeOffset> lastDumpTimeDic =
+                new Dictionary<string, DateTimeOffset>();
+
+            Dictionary<string, IEventHubPartitionContext> partitionContextDic =
+                new Dictionary<string, IEventHubPartitionContext>();
+
+            CancellationTokenSource cancellationTokenSource =
+                new CancellationTokenSource();
+            TaskFactory taskFactory =
+                new TaskFactory(cancellationTokenSource.Token);
+            List<Task> tasksList = new List<Task>();
+
+            DateTimeOffset initialTime =
+                DateTimeOffset.FromUnixTimeSeconds(
+                    DateTimeOffset.UtcNow.ToUnixTimeSeconds());
+            foreach (var partitionInfo in partionInfos)
             {
-                Console.WriteLine($"[Partition - {args.PartitionContext.PartitionId}] [{args.EventType}]");
-                this.PrintObjectInfo(args);
+                string partitionId = partitionInfo.PartitionId;
+                bufferDic[partitionId] = new List<IEventData>();
+                lastDumpTimeDic[partitionId] =
+                    initialTime.AddSeconds(
+                        int.Parse(partitionId) % partionInfos.Count());
+
+                Console.WriteLine($"last dump time for partition {partitionId}: {lastDumpTimeDic[partitionId]}");
+
+                Task task = taskFactory.StartNew(
+                    async () =>
+                    {
+                        while (true)
+                        {
+                            DateTimeOffset checkTime =
+                                DateTimeOffset.FromUnixTimeSeconds(
+                                    DateTimeOffset.UtcNow.ToUnixTimeSeconds());
+
+                            List<IEventData> buffer = bufferDic[partitionId];
+
+                            if (cancellationTokenSource.Token.IsCancellationRequested)
+                            {
+                                if (buffer.Any())
+                                {
+                                    Console.WriteLine($"Dump {buffer.Count} messages from partition {partitionId} at {checkTime:o}.");
+                                    totalReceived += buffer.Count();
+                                    buffer.Clear();
+                                }
+                                break;
+                            }
+
+                            DateTimeOffset lastDumpTime =
+                                lastDumpTimeDic[partitionId];
+
+                            double secondsSinceLastDump =
+                                checkTime.Subtract(lastDumpTime).TotalSeconds;
+
+                            if (buffer.Any()
+                                && secondsSinceLastDump >= partionInfos.Count()
+                                && (secondsSinceLastDump % partionInfos.Count()) == 0)
+                            {
+                                IEventData checkpointData = null;
+
+                                lock (buffer)
+                                {
+                                    Console.WriteLine($"Dump {buffer.Count} messages from partition {partitionId} at {checkTime:o}.");
+                                    totalReceived += buffer.Count();
+
+                                    checkpointData =
+                                        buffer
+                                            .OrderByDescending(e => e.SequenceNumber)
+                                            .FirstOrDefault();
+                                    buffer.Clear();
+                                }
+
+                                if (checkpointData != null)
+                                {
+                                    IEventHubPartitionContext partitionContext =
+                                        partitionContextDic[partitionId];
+                                    await partitionContext
+                                        .CheckpointAsync(checkpointData).ConfigureAwait(false);
+                                }
+
+                                lastDumpTimeDic[partitionId] = checkTime;
+
+                                // Console.WriteLine($"last dump time for partition {partitionId}: {lastDumpTimeDic[partitionId]}");
+                            }
+                            else
+                            {
+                                Thread.Sleep(TimeSpan.FromSeconds(1));
+                            }
+                        }
+                    });
+
+                tasksList.Add(task);
+            }
+
+            Task eventProcessorHandler(object obj, EventProcessorEventArgs args)
+            {
+                // Console.WriteLine($"[Partition - {args.PartitionContext.PartitionId}] [{args.EventType}]");
+                // this.PrintObjectInfo(args);
 
                 if (args.EventType == EventProcessorEventType.DataReceived)
                 {
-                    totalReceived += args.DataCollection.Count();
-                    IEventData eventData =
-                        args.DataCollection
-                            .OrderByDescending(e => e.SequenceNumber)
-                            .FirstOrDefault();
+                    string partitionId = args.PartitionContext.PartitionId;
 
-                    if (eventData != null)
+                    partitionContextDic[partitionId] = args.PartitionContext;
+
+                    List<IEventData> buffer = bufferDic[partitionId];
+
+                    lock (buffer)
                     {
-                        await args.PartitionContext
-                            .CheckpointAsync(eventData).ConfigureAwait(false);
+                        Console.WriteLine($"Buffered {args.DataCollection.Count()} messages from partition {partitionId} at {DateTimeOffset.UtcNow:o}.");
+                        buffer.AddRange(args.DataCollection);
                     }
                 }
+
+                return Task.CompletedTask;
             }
 
             eventProcessor.OnClosed += eventProcessorHandler;
@@ -132,6 +231,9 @@ namespace Winl.AzureDevBox.ConsoleDemo.Demos
                 Console.WriteLine("Receiving event data, press 'q' to exit.");
                 c = Console.ReadKey(true).KeyChar;
             } while(c != 'q');
+
+            cancellationTokenSource.Cancel();
+            Task.WaitAll(tasksList.ToArray());
 
             Console.WriteLine($"Total received: {totalReceived}");
 
